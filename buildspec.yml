@@ -6,13 +6,12 @@ phases:
       nodejs: 16
     commands:
       - pip install --upgrade aws-sam-cli
-      - npm install -g typescript
       - npm install
 
   build:
     commands:
       - sam build -t template.yaml
-      - sam package --s3-bucket ${PACKAGE_BUCKET} --output-template-file packaged.yaml
+      - sam package --s3-bucket ${PACKAGE_BUCKET} --output-template-file packaged.yaml --region ${AWS_REGION}
 
 artifacts:
   files:
