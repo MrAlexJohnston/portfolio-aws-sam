@@ -1,22 +1,25 @@
 version: 0.2
+
 phases:
   install:
+    runtime-versions:
+      nodejs: 14
     commands:
-      # Install all dependencies (including dependencies for running tests)
+      - npm install -g aws-sam-cli
+      - npm install -g typescript
       - npm install
-  pre_build:
-    commands:
-      # Discover and run unit tests in the '__tests__' directory
-      - npm run test
-      # Remove all unit tests to reduce the size of the package that will be ultimately uploaded to Lambda
-      - rm -rf ./__tests__
-      # Remove all dependencies not needed for the Lambda deployment package (the packages from devDependencies in package.json)
-      - npm prune --production
+
   build:
     commands:
-      # Use AWS SAM to package the application by using AWS CloudFormation
-      - sam deploy
+      - npm run build  # This should compile your TypeScript to JavaScript
+      - sam build -t template.yaml
+      - sam package --s3-bucket ${PACKAGE_BUCKET} --output-template-file packaged.yaml
+
 artifacts:
-  type: zip
   files:
-    - template-export.yml
+    - packaged.yaml
+  discard-paths: yes
+
+cache:
+  paths:
+    - 'node_modules/**/*'
