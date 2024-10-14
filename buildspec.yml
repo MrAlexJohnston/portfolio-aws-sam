@@ -11,7 +11,6 @@ phases:
 
   build:
     commands:
-      - npm run build  # This should compile your TypeScript to JavaScript
       - sam build -t template.yaml
       - sam package --s3-bucket ${PACKAGE_BUCKET} --output-template-file packaged.yaml
 
