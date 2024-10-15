@@ -1,24 +1,37 @@
-# This is the SAM template that represents the architecture of your serverless application
-# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-basics.html
-
-# The AWSTemplateFormatVersion identifies the capabilities of the template
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   portfolio-aws-sam
 
-# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
 Transform:
 - AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    VpcConfig:
+      SecurityGroupIds:
+        - !Ref SecurityGroupId  # Use the parameter reference
+      SubnetIds:
+        - !Ref SubnetId1        # Use the parameter reference
+        - !Ref SubnetId2
+        - !Ref SubnetId3
 
-# Resources declares the AWS resources that you want to include in the stack
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Parameters:
+  SecurityGroupId:
+    Type: String
+    Description: "Security Group ID for the Lambda function"
+  
+  SubnetId1:
+    Type: String
+    Description: "Subnet 1 ID for the Lambda function"
+  
+  SubnetId2:
+    Type: String
+    Description: "Subnet 2 ID for the Lambda function"
+  
+  SubnetId3:
+    Type: String
+    Description: "Subnet 3 ID for the Lambda function"
+
 Resources:
-  # Each Lambda function is defined by properties:
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-
-  # This is a Lambda function config associated with the source code: get-all-items.js
   getAllItemsFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -30,12 +43,10 @@ Resources:
       Timeout: 100
       Description: A simple example includes a HTTP get method to get all items from a DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
             TableName: !Ref SampleTable
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
           SAMPLE_TABLE: !Ref SampleTable
       Events:
         Api:
@@ -43,10 +54,6 @@ Resources:
           Properties:
             Path: /
             Method: GET
-  # Each Lambda function is defined by properties:
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-
-  # This is a Lambda function config associated with the source code: get-by-id.js
   getByIdFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -58,12 +65,10 @@ Resources:
       Timeout: 100
       Description: A simple example includes a HTTP get method to get one item by id from a DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
             TableName: !Ref SampleTable
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
           SAMPLE_TABLE: !Ref SampleTable
       Events:
         Api:
@@ -71,10 +76,6 @@ Resources:
           Properties:
             Path: /{id}
             Method: GET
-  # Each Lambda function is defined by properties:
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-
-  # This is a Lambda function config associated with the source code: put-item.js
   putItemFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -86,12 +87,10 @@ Resources:
       Timeout: 100
       Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
       Policies:
-        # Give Create/Read/Update/Delete Permissions to the SampleTable
         - DynamoDBCrudPolicy:
             TableName: !Ref SampleTable
       Environment:
         Variables:
-          # Make table name accessible as environment variable from function code during execution
           SAMPLE_TABLE: !Ref SampleTable
       Events:
         Api:
@@ -99,10 +98,6 @@ Resources:
           Properties:
             Path: /
             Method: POST
-  # Simple syntax to create a DynamoDB table with a single attribute primary key, more in
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
-
-  # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   SampleTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
